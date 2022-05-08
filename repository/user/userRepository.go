@@ -1,4 +1,4 @@
-package repository
+package user
 
 import (
 	"context"
@@ -6,10 +6,11 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"log"
 	"personalFinanceManager/model"
+	"personalFinanceManager/repository"
 )
 
 func getUserCollection() *mongo.Collection {
-	userCollection := client.Database("personal-finance").Collection("users")
+	userCollection := repository.Client.Database("personal-finance").Collection("users")
 	return userCollection
 }
 
@@ -31,6 +32,30 @@ func GetUser(email string) model.User {
 	err := userCollection.FindOne(context.Background(), filter).Decode(&result)
 	if err != nil {
 		log.Fatal(err)
+		return model.User{}
+	}
+	return result
+}
+
+func GetUserById(id string) model.User {
+	userCollection := getUserCollection()
+	var result model.User
+	filter := bson.D{{"id", id}}
+	err := userCollection.FindOne(context.Background(), filter).Decode(&result)
+	if err != nil {
+		log.Fatal(err)
+		return model.User{}
+	}
+	return result
+}
+
+func UpdateUser(user model.User, updatedFields bson.D) model.User {
+	userCollection := getUserCollection()
+	var result model.User
+	filter := bson.D{{"id", user.ID}}
+	err := userCollection.FindOneAndUpdate(context.Background(), filter, updatedFields).Decode(&result)
+	log.Printf("Updated user %v", result)
+	if err != nil {
 		return model.User{}
 	}
 	return result
