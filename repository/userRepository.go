@@ -8,41 +8,37 @@ import (
 	"personalFinanceManager/model"
 )
 
-func getUserCollection() (*mongo.Collection, *mongo.Client) {
-	client := createConnection()
+func getUserCollection() *mongo.Collection {
 	userCollection := client.Database("personal-finance").Collection("users")
-	return userCollection, client
+	return userCollection
 }
 
 func AddUser(user model.User) model.User {
-	userCollection, client := getUserCollection()
-	insertOneResult, err := userCollection.InsertOne(context.TODO(), user)
+	userCollection := getUserCollection()
+	insertOneResult, err := userCollection.InsertOne(context.Background(), user)
 	if err != nil {
 		log.Fatal(err)
 		return model.User{}
 	}
 	log.Print("Inserted one user : ", insertOneResult.InsertedID)
-	disconnect(client)
 	return user
 }
 
 func GetUser(email string) model.User {
-	userCollection, client := getUserCollection()
+	userCollection := getUserCollection()
 	var result model.User
 	filter := bson.D{{"email", email}}
-	err := userCollection.FindOne(context.TODO(), filter).Decode(&result)
+	err := userCollection.FindOne(context.Background(), filter).Decode(&result)
 	if err != nil {
 		log.Fatal(err)
 		return model.User{}
 	}
-	disconnect(client)
 	return result
 }
 
 func CheckEmailExists(email string) bool {
-	userCollection, client := getUserCollection()
+	userCollection := getUserCollection()
 	filter := bson.D{{"email", email}}
-	err := userCollection.FindOne(context.TODO(), filter).Err()
-	disconnect(client)
+	err := userCollection.FindOne(context.Background(), filter).Err()
 	return err == nil
 }

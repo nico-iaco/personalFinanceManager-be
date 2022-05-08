@@ -8,7 +8,9 @@ import (
 	"personalFinanceManager/utils"
 )
 
-func createConnection() *mongo.Client {
+var client *mongo.Client
+
+func CreateConnection() {
 	databaseUrl := utils.GetStringProperty("database.url")
 	username := utils.GetStringProperty("database.username")
 	pwd := utils.GetStringProperty("database.password")
@@ -16,24 +18,25 @@ func createConnection() *mongo.Client {
 		Username: username,
 		Password: pwd,
 	}
+	var err error
 	clientOptions := options.Client().ApplyURI(databaseUrl).SetAuth(credential)
-	client, err := mongo.Connect(context.TODO(), clientOptions)
+	client, err = mongo.Connect(context.Background(), clientOptions)
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// Check the connection
-	err = client.Ping(context.TODO(), nil)
+	err = client.Ping(context.Background(), nil)
 
 	if err != nil {
 		log.Fatal(err)
 	}
-	return client
+	log.Println("Started mongodb connection...")
 }
 
-func disconnect(client *mongo.Client) {
-	err := client.Disconnect(context.TODO())
+func Disconnect() {
+	err := client.Disconnect(context.Background())
 
 	if err != nil {
 		log.Fatal(err)
