@@ -22,6 +22,13 @@ func main() {
 		accountController.DELETE("", controller.DeleteAccount)
 	}
 
+	accountMovementsController := r.Group("/user/account/movement").Use(middleware.AuthorizeJwt())
+	{
+		accountMovementsController.GET("", controller.GetUserAccountMovements)
+		accountMovementsController.POST("", controller.AddAccountMovement)
+		accountMovementsController.DELETE("/:movementId", controller.DeleteAccountMovement)
+	}
+
 	err := r.Run()
 	if err != nil {
 		return
