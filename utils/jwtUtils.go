@@ -3,26 +3,37 @@ package utils
 import (
 	"fmt"
 	"github.com/golang-jwt/jwt"
-	"log"
 	"personalFinanceManager/model"
+	"time"
 )
 
 var hmacSecret = []byte("test") //FIXME
 
-func GenerateJwt(user model.User) string {
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"userId": user.ID,
-	})
-
-	// Sign and get the complete encoded token as a string using the secret
-	tokenString, err := token.SignedString(hmacSecret)
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-	return tokenString
+type authCustomClaims struct {
+	Id string `json:"userId"`
+	jwt.StandardClaims
 }
 
-func DecodeJwt(tokenString string) string {
+func GenerateJwt(user model.User) string {
+	claims := &authCustomClaims{
+		user.ID,
+		jwt.StandardClaims{
+			ExpiresAt: time.Now().Add(time.Hour * 48).Unix(),
+			Issuer:    "personal-finance-manager",
+			IssuedAt:  time.Now().Unix(),
+		},
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+	//encoded string
+	t, err := token.SignedString(hmacSecret)
+	if err != nil {
+		panic(err)
+	}
+	return t
+}
+
+func DecodeJwt(tokenString string) (*jwt.Token, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		// Don't forget to validate the alg is what you expect:
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -32,10 +43,5 @@ func DecodeJwt(tokenString string) string {
 		return hmacSecret, nil
 	})
 
-	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		return fmt.Sprintf("%v", claims["userId"])
-	} else {
-		fmt.Println(err)
-	}
-	return ""
+	return token, err
 }

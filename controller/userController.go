@@ -7,7 +7,7 @@ import (
 	"personalFinanceManager/model"
 	"personalFinanceManager/model/request"
 	"personalFinanceManager/model/response"
-	"personalFinanceManager/repository"
+	"personalFinanceManager/repository/user"
 	"personalFinanceManager/utils"
 )
 
@@ -22,7 +22,7 @@ func RegisterUser(c *gin.Context) {
 		return
 	}
 
-	emailExists := repository.CheckEmailExists(input.Email)
+	emailExists := user.CheckEmailExists(input.Email)
 	if emailExists {
 		c.JSON(http.StatusOK, response.BaseResponse[string]{
 			402,
@@ -34,7 +34,7 @@ func RegisterUser(c *gin.Context) {
 
 	encodedPassword, _ := utils.HashPassword(input.Password)
 
-	user := model.User{
+	u := model.User{
 		ID:          xid.New().String(),
 		Firstname:   input.Firstname,
 		Lastname:    input.Lastname,
@@ -46,7 +46,7 @@ func RegisterUser(c *gin.Context) {
 		Cryptos:     nil,
 	}
 
-	userAdded := repository.AddUser(user)
+	userAdded := user.AddUser(u)
 	c.JSON(http.StatusOK, response.BaseResponse[model.User]{
 		http.StatusOK,
 		userAdded,
@@ -65,8 +65,8 @@ func Login(c *gin.Context) {
 		})
 		return
 	}
-	user := repository.GetUser(input.Email)
-	if !utils.CheckPasswordHash(input.Password, user.Password) {
+	u := user.GetUser(input.Email)
+	if !utils.CheckPasswordHash(input.Password, u.Password) {
 		c.JSON(http.StatusOK, response.BaseResponse[string]{
 			400,
 			"",
@@ -74,9 +74,9 @@ func Login(c *gin.Context) {
 		})
 		return
 	}
-	jwt := utils.GenerateJwt(user)
+	jwt := utils.GenerateJwt(u)
 	loginResponse := response.LoginResponse{
-		User: user,
+		User: u,
 		Jwt:  jwt,
 	}
 	c.JSON(http.StatusOK, response.BaseResponse[response.LoginResponse]{
