@@ -7,6 +7,7 @@ import (
 	"log"
 	"personalFinanceManager/src/model"
 	"personalFinanceManager/src/repository"
+	"strings"
 )
 
 func getMovementsCollection() *mongo.Collection {
@@ -59,6 +60,7 @@ func EditUserMovement(userId, movementId string, updatedField bson.D) model.Move
 
 func DeleteUserMovement(userId, movementId string) bool {
 	movementsCollection := getMovementsCollection()
+
 	filter := bson.D{
 		{"id", movementId},
 		{"user", userId},
@@ -66,7 +68,9 @@ func DeleteUserMovement(userId, movementId string) bool {
 	element, err := movementsCollection.DeleteOne(context.Background(), filter)
 	if err != nil || element.DeletedCount == 0 {
 		log.Println(err)
-		log.Printf("The movement %v was not deleted", movementId)
+		escapedMovementId := strings.Replace(userId, "\n", "", -1)
+		escapedMovementId = strings.Replace(escapedMovementId, "\r", "", -1)
+		log.Printf("The movement %v was not deleted", escapedMovementId)
 		return false
 	}
 	return true

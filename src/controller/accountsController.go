@@ -11,12 +11,17 @@ import (
 	"personalFinanceManager/src/model/response"
 	"personalFinanceManager/src/repository/movement"
 	"personalFinanceManager/src/repository/user"
+	"strings"
 )
 
 func AddAccount(c *gin.Context) {
 	userId := c.GetString("userId")
 	accountName := c.Query("accountName")
-	log.Printf("Adding %v account to user %v", accountName, userId)
+	escapedUserId := strings.Replace(userId, "\n", "", -1)
+	escapedUserId = strings.Replace(escapedUserId, "\r", "", -1)
+	escapedAccountName := strings.Replace(userId, "\n", "", -1)
+	escapedAccountName = strings.Replace(escapedAccountName, "\r", "", -1)
+	log.Printf("Adding %v account to user %v", escapedAccountName, escapedUserId)
 	u := user.GetUserById(userId)
 	accounts := u.Accounts
 	if accounts == nil {
@@ -145,7 +150,9 @@ func AddAccountMovement(c *gin.Context) {
 func DeleteAccountMovement(c *gin.Context) {
 	userId := c.GetString("userId")
 	movementId := c.Param("movementId")
-	log.Println("Deleting " + movementId + " movement")
+	escapedMovementId := strings.Replace(userId, "\n", "", -1)
+	escapedMovementId = strings.Replace(escapedMovementId, "\r", "", -1)
+	log.Printf("Deleting %v movement", escapedMovementId)
 	isMovementDeleted := movement.DeleteUserMovement(userId, movementId)
 	if !isMovementDeleted {
 		c.JSON(http.StatusOK, response.BaseResponse[string]{
