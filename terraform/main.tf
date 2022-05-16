@@ -44,6 +44,12 @@ resource "google_cloudbuild_trigger" "personal-finance-manager-be-image-trigger"
       branch = "main"
     }
   }
+  ignored_files = [
+    "terraform/**",
+    "README.md",
+    ".github/**",
+    ".gitignore"
+  ]
 
   substitutions = {
     _REPOSITORY = google_artifact_registry_repository.personal-finance-manager-ar.name
