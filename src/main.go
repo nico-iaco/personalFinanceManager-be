@@ -10,7 +10,6 @@ import (
 func main() {
 	r := gin.Default()
 	repository.CreateConnection()
-	defer repository.Disconnect()
 
 	r.POST("/register", controller.RegisterUser) //Api to register user
 	r.POST("/login", controller.Login)           //Api to login user

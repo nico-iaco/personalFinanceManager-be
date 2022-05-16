@@ -19,7 +19,7 @@ func AddAccount(c *gin.Context) {
 	accountName := c.Query("accountName")
 	escapedUserId := strings.Replace(userId, "\n", "", -1)
 	escapedUserId = strings.Replace(escapedUserId, "\r", "", -1)
-	escapedAccountName := strings.Replace(userId, "\n", "", -1)
+	escapedAccountName := strings.Replace(accountName, "\n", "", -1)
 	escapedAccountName = strings.Replace(escapedAccountName, "\r", "", -1)
 	log.Printf("Adding %v account to user %v", escapedAccountName, escapedUserId)
 	u := user.GetUserById(userId)

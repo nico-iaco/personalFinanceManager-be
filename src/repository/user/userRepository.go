@@ -2,26 +2,25 @@ package user
 
 import (
 	"context"
+	"github.com/kamva/mgm/v3"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
 	"log"
 	"personalFinanceManager/src/model"
-	"personalFinanceManager/src/repository"
 )
 
-func getUserCollection() *mongo.Collection {
-	userCollection := repository.Client.Database("personal-finance").Collection("users")
+func getUserCollection() *mgm.Collection {
+	userCollection := mgm.Coll(&model.User{})
 	return userCollection
 }
 
 func AddUser(user model.User) model.User {
 	userCollection := getUserCollection()
-	insertOneResult, err := userCollection.InsertOne(context.Background(), user)
+	err := userCollection.Create(&user)
 	if err != nil {
 		log.Fatal(err)
 		return model.User{}
 	}
-	log.Print("Inserted one user : ", insertOneResult.InsertedID)
+	log.Print("Inserted one user : ", user.ID)
 	return user
 }
 

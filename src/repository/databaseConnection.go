@@ -1,14 +1,11 @@
 package repository
 
 import (
-	"context"
-	"go.mongodb.org/mongo-driver/mongo"
+	"github.com/kamva/mgm/v3"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
 	"personalFinanceManager/src/utils"
 )
-
-var Client *mongo.Client
 
 func CreateConnection() {
 	databaseUrl := utils.GetStringProperty("database.url")
@@ -18,29 +15,12 @@ func CreateConnection() {
 		Username: username,
 		Password: pwd,
 	}
-	var err error
 	clientOptions := options.Client().ApplyURI(databaseUrl).SetAuth(credential)
-	Client, err = mongo.Connect(context.Background(), clientOptions)
-
+	//Client, err = mongo.Connect(context.Background(), clientOptions)
+	err := mgm.SetDefaultConfig(nil, "personal-finance", clientOptions)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// Check the connection
-	err = Client.Ping(context.Background(), nil)
-
-	if err != nil {
-		log.Fatal(err)
-	}
 	log.Println("Started mongodb connection...")
-}
-
-func Disconnect() {
-	err := Client.Disconnect(context.Background())
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	log.Println("Connection to MongoDB closed.")
 }

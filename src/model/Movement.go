@@ -1,6 +1,9 @@
 package model
 
-import "go.mongodb.org/mongo-driver/bson/primitive"
+import (
+	"github.com/kamva/mgm/v3"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
 
 // Movement
 // this class represent an economic movement if source is populated the movement is an expense
@@ -8,11 +11,12 @@ import "go.mongodb.org/mongo-driver/bson/primitive"
 // or is a recurring investment from an account to an investment
 ///**
 type Movement struct {
-	ID          string             `json:"id"`
-	User        string             `json:"userId"`
-	Source      string             `json:"source,omitempty"`
-	Destination string             `json:"destination,omitempty"`
-	Amount      float64            `json:"amount"`
-	Date        primitive.DateTime `json:"date"`
-	Note        string             `json:"note,omitempty"`
+	mgm.DefaultModel `bson:",inline" json:"-"`
+	ID               string             `json:"id"`
+	User             string             `json:"userId"`
+	Source           string             `json:"source,omitempty"`
+	Destination      string             `json:"destination,omitempty"`
+	Amount           float64            `json:"amount"`
+	Date             primitive.DateTime `json:"date"`
+	Note             string             `json:"note,omitempty"`
 }
