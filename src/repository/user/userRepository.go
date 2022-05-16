@@ -6,6 +6,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"log"
 	"personalFinanceManager/src/model"
+	"personalFinanceManager/src/utils"
 )
 
 func getUserCollection() *mgm.Collection {
@@ -27,7 +28,7 @@ func AddUser(user model.User) model.User {
 func GetUser(email string) model.User {
 	userCollection := getUserCollection()
 	var result model.User
-	filter := bson.D{{"email", email}}
+	filter := bson.D{{"email", utils.SanitizeString(email)}}
 	err := userCollection.FindOne(context.Background(), filter).Decode(&result)
 	if err != nil {
 		log.Fatal(err)
@@ -39,7 +40,7 @@ func GetUser(email string) model.User {
 func GetUserById(id string) model.User {
 	userCollection := getUserCollection()
 	var result model.User
-	filter := bson.D{{"id", id}}
+	filter := bson.D{{"id", utils.SanitizeString(id)}}
 	err := userCollection.FindOne(context.Background(), filter).Decode(&result)
 	if err != nil {
 		log.Fatal(err)
@@ -62,7 +63,7 @@ func UpdateUser(user model.User, updatedFields bson.D) model.User {
 
 func CheckEmailExists(email string) bool {
 	userCollection := getUserCollection()
-	filter := bson.D{{"email", email}}
+	filter := bson.D{{"email", utils.SanitizeString(email)}}
 	err := userCollection.FindOne(context.Background(), filter).Err()
 	return err == nil
 }

@@ -6,7 +6,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"log"
 	"personalFinanceManager/src/model"
-	"strings"
+	"personalFinanceManager/src/utils"
 )
 
 func getMovementsCollection() *mgm.Collection {
@@ -60,16 +60,14 @@ func DeleteUserMovement(userId, movementId string) bool {
 	movementsCollection := getMovementsCollection()
 
 	filter := bson.D{
-		{"id", movementId},
-		{"user", userId},
+		{"id", utils.SanitizeString(movementId)},
+		{"user", utils.SanitizeString(userId)},
 	}
 	element := getMovement(filter)
 	err := movementsCollection.Delete(&element)
 	if err != nil {
 		log.Println(err)
-		escapedMovementId := strings.Replace(userId, "\n", "", -1)
-		escapedMovementId = strings.Replace(escapedMovementId, "\r", "", -1)
-		log.Printf("The movement %v was not deleted", escapedMovementId)
+		log.Printf("The movement %v was not deleted", utils.SanitizeString(movementId))
 		return false
 	}
 	return true
