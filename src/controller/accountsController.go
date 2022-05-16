@@ -173,3 +173,22 @@ func GetUserAccountMovements(c *gin.Context) {
 		"",
 	})
 }
+
+func GetAccountBalance(c *gin.Context) {
+	userId := c.GetString("userId")
+	accountName := c.Param("accountName")
+	balance, err := movement.GetAccountBalance(utils.SanitizeString(userId), utils.SanitizeString(accountName))
+	if err != nil {
+		c.JSON(http.StatusOK, response.BaseResponse[string]{
+			http.StatusServiceUnavailable,
+			"",
+			err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, response.BaseResponse[float64]{
+		http.StatusOK,
+		balance,
+		"",
+	})
+}

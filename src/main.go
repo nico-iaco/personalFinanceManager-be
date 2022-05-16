@@ -19,6 +19,7 @@ func main() {
 		accountController.POST("", controller.AddAccount)
 		accountController.PATCH("", controller.EditAccount)
 		accountController.DELETE("", controller.DeleteAccount)
+		accountController.GET("/:accountName", controller.GetAccountBalance)
 	}
 
 	accountMovementsController := r.Group("/user/account/movement").Use(middleware.AuthorizeJwt())

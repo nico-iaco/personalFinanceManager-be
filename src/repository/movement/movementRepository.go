@@ -3,7 +3,9 @@ package movement
 import (
 	"context"
 	"github.com/kamva/mgm/v3"
-	"go.mongodb.org/mongo-driver/bson"
+	"github.com/kamva/mgm/v3/builder"
+	operator "github.com/kamva/mgm/v3/operator"
+	bson "go.mongodb.org/mongo-driver/bson"
 	"log"
 	"personalFinanceManager/src/model"
 	"personalFinanceManager/src/utils"
@@ -33,7 +35,7 @@ func GetUserMovements(userId string) []*model.Movement {
 func GetUserAccountMovements(userId, accountName string) []*model.Movement {
 	filter := bson.D{
 		{"user", userId},
-		{"$or", []bson.D{
+		{operator.Or, []bson.D{
 			{{"source", accountName}},
 			{{"destination", accountName}},
 		}},
@@ -91,6 +93,34 @@ func getMovementList(filter bson.D) []*model.Movement {
 		log.Fatal(err)
 	}
 
-	log.Printf("Found multiple documents (array of pointers): %+v\n", userMovements)
 	return userMovements
+}
+
+func GetAccountBalance(userId, accountName string) (float64, error) {
+	income, err := getIncomeMovementSum(userId, accountName)
+	log.Printf("Get income: %v", income)
+
+	return income, err
+}
+
+func getIncomeMovementSum(userId, accountName string) (float64, error) {
+	var result []model.IncomeDto
+	movementsCollection := getMovementsCollection()
+	err := movementsCollection.SimpleAggregate(&result,
+		bson.M{operator.Match: bson.M{operator.And: []bson.D{
+			{{"destination", accountName}},
+			{{"user", userId}},
+		}}},
+		builder.S(builder.Group(
+			bson.M{"_id": "$destination"},
+			bson.M{"income": bson.M{
+				operator.Sum: "$amount",
+			}},
+		)),
+	)
+	if err != nil {
+		log.Println(err)
+		return 0, err
+	}
+	return result[0].Income, nil
 }
