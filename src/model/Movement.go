@@ -17,6 +17,7 @@ type Movement struct {
 	Source           string             `json:"source,omitempty"`
 	Destination      string             `json:"destination,omitempty"`
 	Amount           float64            `json:"amount"`
+	Category         string             `json:"category"`
 	Date             primitive.DateTime `json:"date"`
 	Note             string             `json:"note,omitempty"`
 }
