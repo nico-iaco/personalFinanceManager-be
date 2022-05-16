@@ -3,7 +3,7 @@ package utils
 import (
 	"fmt"
 	"github.com/golang-jwt/jwt"
-	"personalFinanceManager/model"
+	"personalFinanceManager/src/model"
 	"time"
 )
 

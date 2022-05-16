@@ -5,8 +5,8 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"log"
-	"personalFinanceManager/model"
-	"personalFinanceManager/repository"
+	"personalFinanceManager/src/model"
+	"personalFinanceManager/src/repository"
 )
 
 func getUserCollection() *mongo.Collection {

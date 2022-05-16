@@ -5,7 +5,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
-	"personalFinanceManager/utils"
+	"personalFinanceManager/src/utils"
 )
 
 var Client *mongo.Client

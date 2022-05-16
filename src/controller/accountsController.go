@@ -7,10 +7,10 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"log"
 	"net/http"
-	"personalFinanceManager/model"
-	"personalFinanceManager/model/response"
-	"personalFinanceManager/repository/movement"
-	"personalFinanceManager/repository/user"
+	"personalFinanceManager/src/model"
+	"personalFinanceManager/src/model/response"
+	"personalFinanceManager/src/repository/movement"
+	"personalFinanceManager/src/repository/user"
 )
 
 func AddAccount(c *gin.Context) {

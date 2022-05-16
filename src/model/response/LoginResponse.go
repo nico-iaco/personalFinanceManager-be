@@ -1,6 +1,8 @@
 package response
 
-import "personalFinanceManager/model"
+import (
+	"personalFinanceManager/src/model"
+)
 
 type LoginResponse struct {
 	User model.User `json:"user"`

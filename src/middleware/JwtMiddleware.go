@@ -5,7 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 	"net/http"
-	"personalFinanceManager/utils"
+	"personalFinanceManager/src/utils"
 )
 
 func AuthorizeJwt() gin.HandlerFunc {

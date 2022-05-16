@@ -8,12 +8,14 @@ RUN go mod download
 
 COPY . .
 
-RUN go build
+WORKDIR /app/src
+RUN go build -o personalFinanceManager
 
 FROM alpine
 
 WORKDIR /root/
 
-COPY --from=builder /app/personalFinanceManager .
+COPY --from=builder /app/src/personalFinanceManager .
+COPY --from=builder /app/src/*.properties .
 
 CMD ["./personalFinanceManager"]

@@ -2,9 +2,9 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
-	"personalFinanceManager/controller"
-	"personalFinanceManager/middleware"
-	"personalFinanceManager/repository"
+	"personalFinanceManager/src/controller"
+	"personalFinanceManager/src/middleware"
+	"personalFinanceManager/src/repository"
 )
 
 func main() {
