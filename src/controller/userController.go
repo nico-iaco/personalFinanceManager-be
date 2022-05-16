@@ -4,11 +4,11 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/rs/xid"
 	"net/http"
-	"personalFinanceManager/model"
-	"personalFinanceManager/model/request"
-	"personalFinanceManager/model/response"
-	"personalFinanceManager/repository/user"
-	"personalFinanceManager/utils"
+	"personalFinanceManager/src/model"
+	"personalFinanceManager/src/model/request"
+	"personalFinanceManager/src/model/response"
+	"personalFinanceManager/src/repository/user"
+	"personalFinanceManager/src/utils"
 )
 
 func RegisterUser(c *gin.Context) {

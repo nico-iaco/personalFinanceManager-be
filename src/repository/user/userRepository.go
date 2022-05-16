@@ -2,33 +2,33 @@ package user
 
 import (
 	"context"
+	"github.com/kamva/mgm/v3"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
 	"log"
-	"personalFinanceManager/model"
-	"personalFinanceManager/repository"
+	"personalFinanceManager/src/model"
+	"personalFinanceManager/src/utils"
 )
 
-func getUserCollection() *mongo.Collection {
-	userCollection := repository.Client.Database("personal-finance").Collection("users")
+func getUserCollection() *mgm.Collection {
+	userCollection := mgm.Coll(&model.User{})
 	return userCollection
 }
 
 func AddUser(user model.User) model.User {
 	userCollection := getUserCollection()
-	insertOneResult, err := userCollection.InsertOne(context.Background(), user)
+	err := userCollection.Create(&user)
 	if err != nil {
 		log.Fatal(err)
 		return model.User{}
 	}
-	log.Print("Inserted one user : ", insertOneResult.InsertedID)
+	log.Print("Inserted one user : ", user.ID)
 	return user
 }
 
 func GetUser(email string) model.User {
 	userCollection := getUserCollection()
 	var result model.User
-	filter := bson.D{{"email", email}}
+	filter := bson.D{{"email", utils.SanitizeString(email)}}
 	err := userCollection.FindOne(context.Background(), filter).Decode(&result)
 	if err != nil {
 		log.Fatal(err)
@@ -40,7 +40,7 @@ func GetUser(email string) model.User {
 func GetUserById(id string) model.User {
 	userCollection := getUserCollection()
 	var result model.User
-	filter := bson.D{{"id", id}}
+	filter := bson.D{{"id", utils.SanitizeString(id)}}
 	err := userCollection.FindOne(context.Background(), filter).Decode(&result)
 	if err != nil {
 		log.Fatal(err)
@@ -63,7 +63,7 @@ func UpdateUser(user model.User, updatedFields bson.D) model.User {
 
 func CheckEmailExists(email string) bool {
 	userCollection := getUserCollection()
-	filter := bson.D{{"email", email}}
+	filter := bson.D{{"email", utils.SanitizeString(email)}}
 	err := userCollection.FindOne(context.Background(), filter).Err()
 	return err == nil
 }

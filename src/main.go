@@ -2,15 +2,14 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
-	"personalFinanceManager/controller"
-	"personalFinanceManager/middleware"
-	"personalFinanceManager/repository"
+	"personalFinanceManager/src/controller"
+	"personalFinanceManager/src/middleware"
+	"personalFinanceManager/src/repository"
 )
 
 func main() {
 	r := gin.Default()
 	repository.CreateConnection()
-	defer repository.Disconnect()
 
 	r.POST("/register", controller.RegisterUser) //Api to register user
 	r.POST("/login", controller.Login)           //Api to login user

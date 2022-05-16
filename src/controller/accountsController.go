@@ -7,16 +7,17 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"log"
 	"net/http"
-	"personalFinanceManager/model"
-	"personalFinanceManager/model/response"
-	"personalFinanceManager/repository/movement"
-	"personalFinanceManager/repository/user"
+	"personalFinanceManager/src/model"
+	"personalFinanceManager/src/model/response"
+	"personalFinanceManager/src/repository/movement"
+	"personalFinanceManager/src/repository/user"
+	"personalFinanceManager/src/utils"
 )
 
 func AddAccount(c *gin.Context) {
 	userId := c.GetString("userId")
 	accountName := c.Query("accountName")
-	log.Printf("Adding %v account to user %v", accountName, userId)
+	log.Printf("Adding %v account to user %v", utils.SanitizeString(accountName), utils.SanitizeString(userId))
 	u := user.GetUserById(userId)
 	accounts := u.Accounts
 	if accounts == nil {
@@ -145,7 +146,7 @@ func AddAccountMovement(c *gin.Context) {
 func DeleteAccountMovement(c *gin.Context) {
 	userId := c.GetString("userId")
 	movementId := c.Param("movementId")
-	log.Println("Deleting " + movementId + " movement")
+	log.Printf("Deleting %v movement", utils.SanitizeString(movementId))
 	isMovementDeleted := movement.DeleteUserMovement(userId, movementId)
 	if !isMovementDeleted {
 		c.JSON(http.StatusOK, response.BaseResponse[string]{

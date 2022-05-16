@@ -2,21 +2,20 @@ package movement
 
 import (
 	"context"
+	"github.com/kamva/mgm/v3"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
 	"log"
-	"personalFinanceManager/model"
-	"personalFinanceManager/repository"
+	"personalFinanceManager/src/model"
+	"personalFinanceManager/src/utils"
 )
 
-func getMovementsCollection() *mongo.Collection {
-	movementsCollection := repository.Client.Database("personal-finance").Collection("movements")
+func getMovementsCollection() *mgm.Collection {
+	movementsCollection := mgm.Coll(&model.Movement{})
 	return movementsCollection
 }
 
 func AddMovement(movement model.Movement) model.Movement {
-	movementsCollection := getMovementsCollection()
-	_, err := movementsCollection.InsertOne(context.Background(), movement)
+	err := getMovementsCollection().Create(&movement)
 	if err != nil {
 		log.Fatal(err)
 		return model.Movement{}
@@ -59,50 +58,37 @@ func EditUserMovement(userId, movementId string, updatedField bson.D) model.Move
 
 func DeleteUserMovement(userId, movementId string) bool {
 	movementsCollection := getMovementsCollection()
+
 	filter := bson.D{
-		{"id", movementId},
-		{"user", userId},
+		{"id", utils.SanitizeString(movementId)},
+		{"user", utils.SanitizeString(userId)},
 	}
-	element, err := movementsCollection.DeleteOne(context.Background(), filter)
-	if err != nil || element.DeletedCount == 0 {
+	element := getMovement(filter)
+	err := movementsCollection.Delete(&element)
+	if err != nil {
 		log.Println(err)
-		log.Printf("The movement %v was not deleted", movementId)
+		log.Printf("The movement %v was not deleted", utils.SanitizeString(movementId))
 		return false
 	}
 	return true
 }
 
+func getMovement(filter bson.D) model.Movement {
+	result := model.Movement{}
+	err := getMovementsCollection().First(filter, &result)
+	if err != nil {
+		log.Println(err)
+		return model.Movement{}
+	}
+	return result
+}
+
 func getMovementList(filter bson.D) []*model.Movement {
 	movementsCollection := getMovementsCollection()
 	var userMovements []*model.Movement
-	cur, err := movementsCollection.Find(context.Background(), bson.D{{}})
+	err := movementsCollection.SimpleFind(&userMovements, filter)
 	if err != nil {
 		log.Fatal(err)
-	}
-
-	// Finding multiple documents returns a cursor
-	// Iterating through the cursor allows us to decode documents one at a time
-	for cur.Next(context.Background()) {
-
-		// create a value into which the single document can be decoded
-		var elem model.Movement
-		err := cur.Decode(&elem)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		userMovements = append(userMovements, &elem)
-	}
-
-	if err := cur.Err(); err != nil {
-		log.Fatal(err)
-	}
-
-	// Close the cursor once finished
-	err = cur.Close(context.Background())
-	if err != nil {
-		log.Fatal(err)
-		return nil
 	}
 
 	log.Printf("Found multiple documents (array of pointers): %+v\n", userMovements)
